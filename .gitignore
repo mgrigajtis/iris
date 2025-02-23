@@ -1,0 +1,56 @@
+# Ignore compiled binaries and object files
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+
+# Ignore CMake build artifacts
+/CMakeCache.txt
+/CMakeFiles/
+/cmake_install.cmake
+/Makefile
+/build/
+/out/
+/bin/
+
+# Ignore editor and IDE specific files
+.vscode/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+*.idea/
+*.iml
+
+# Ignore dependency management files
+*.d
+*.lo
+*.la
+
+# Ignore logs and debugging files
+*.log
+*.trace
+
+# Ignore PostgreSQL connection files
+pg_hba.conf
+postgresql.conf
+.pgpass
+
+# Ignore environment files
+.env
+.env.local
+
+# Ignore backup and temporary files
+*~
+*.bak
+*.swp
+
+# Ignore JSON config files (if sensitive)
+config.json
+secrets.json
+
+# Ignore local settings
+/localsettings/
