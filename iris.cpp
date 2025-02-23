@@ -1,13 +1,19 @@
+#include <chrono>
 #include <vector>
 #include <string>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <iostream>
 #include <jsoncpp/json/json.h>
 #include "headers/irismqttclient.h"
 
 // Define AES block size
 #define AES_BLOCK_SIZE 16
+
+std::string generate_unique_mqtt_client_id() {
+    return "Iris_" + std::to_string(std::chrono::system_clock::now().time_since_epoch().count());
+}
 
 Json::Value load_json_from_file(const std::string &filename) {
     std::ifstream file(filename);
@@ -155,7 +161,8 @@ int main() {
 
     // Initialize MQTT
     mosqpp::lib_init();
-    IrisMQTTClient client("Iris", mqtthost.c_str(), mqttport, mqtttimeout, &topics, conn);
+    std::string unique_client_id = generate_unique_mqtt_client_id();
+    IrisMQTTClient client(unique_client_id.c_str(), mqtthost.c_str(), mqttport, mqtttimeout, &topics, conn);
 
     // Subscribe to each topic from the config file
     for (const auto &topic : topics) {
