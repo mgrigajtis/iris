@@ -40,12 +40,11 @@ jobs:
     - name: Install Dependencies on Ubuntu
       if: runner.os == 'Linux'
       run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          libmosquitto-dev \
-          libpqxx-dev \
-          libssl-dev \
-          libjsoncpp-dev
+        sudo apt update
+        sudo apt install -y libmosquitto-dev
+        sudo apt install libpqxx-dev
+        sudo apt install libssl-dev
+        sudo apt install libjsoncpp-dev
 
     - name: Install Dependencies on Windows
       if: runner.os == 'Windows'
