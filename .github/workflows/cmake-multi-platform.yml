@@ -42,6 +42,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y libmosquitto-dev
+        sudo apt install -y libmosquittopp-dev 
         sudo apt install -y libpqxx-dev
         sudo apt install -y libssl-dev
         sudo apt install -y libjsoncpp-dev
