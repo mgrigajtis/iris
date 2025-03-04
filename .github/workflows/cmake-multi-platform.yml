@@ -50,6 +50,7 @@ jobs:
     - name: Install Dependencies on Windows
       if: runner.os == 'Windows'
       run: |
+        call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
         choco install vcpkg --yes
         vcpkg install mosquitto:x64-windows
         vcpkg install libpqxx:x64-windows
