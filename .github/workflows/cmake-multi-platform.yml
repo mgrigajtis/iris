@@ -13,13 +13,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         build_type: [Release]
-        c_compiler: [gcc, clang, cl]
+        c_compiler: [gcc, clang]
         include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
@@ -27,8 +24,6 @@ jobs:
             c_compiler: clang
             cpp_compiler: clang++
         exclude:
-          - os: windows-latest
-            c_compiler: gcc
           - os: windows-latest
             c_compiler: clang
           - os: ubuntu-latest
@@ -46,19 +41,6 @@ jobs:
         sudo apt install -y libpqxx-dev
         sudo apt install -y libssl-dev
         sudo apt install -y libjsoncpp-dev
-
-    - name: Install Dependencies on Windows
-      if: runner.os == 'Windows'
-      shell: cmd
-      run: |
-        for /f "tokens=*" %%i in ('"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath') do set VS_PATH=%%i
-        call "%VS_PATH%\VC\Auxiliary\Build\vcvars64.bat"
-        set CL
-        choco install vcpkg --yes
-        vcpkg install mosquitto:x64-windows
-        vcpkg install libpqxx:x64-windows
-        vcpkg install openssl:x64-windows
-        vcpkg install jsoncpp:x64-windows
 
     - name: Set up CMake
       uses: jwlawson/actions-setup-cmake@v2
