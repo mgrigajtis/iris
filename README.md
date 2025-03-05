@@ -1,5 +1,7 @@
 # Iris
 
+[![CMake on multiple platforms](https://github.com/mgrigajtis/iris/actions/workflows/cmake-multi-platform.yml/badge.svg)](https://github.com/mgrigajtis/iris/actions/workflows/cmake-multi-platform.yml)
+
 Iris is a C++ application that integrates **MQTT messaging** with a **PostgreSQL database**. It listens to specified MQTT topics, processes messages, decrypts them if necessary, and stores them in a PostgreSQL database.
 
 ## Features
