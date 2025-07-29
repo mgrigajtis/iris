@@ -96,8 +96,8 @@ void insert_message(pqxx::connection* conn, const std::string& topic, const std:
 }
 
 
-IrisMQTTClient::IrisMQTTClient(const char *id, const char *host, int port, int timeout, std::vector<Topic> *topics_list, pqxx::connection* dbconn) 
-    : mosquittopp(id), topics(topics_list), conn(dbconn) {
+IrisMQTTClient::IrisMQTTClient(const char *id, const char *host, int port, int timeout, std::vector<Topic> *topics_list, int batchSize, pqxx::connection* dbconn) 
+    : mosquittopp(id), topics(topics_list), batch_size(batchSize), conn(dbconn) {
     connect(host, port, timeout);
 
     std::cout << "Connected to queue" << std::endl;
@@ -117,7 +117,7 @@ void IrisMQTTClient::on_message(const struct mosquitto_message *message) {
     try {
         aes_key = topic_map.at(message_topic).aes_key;  // ✅ Throws if key is missing
     } catch (const std::out_of_range&) {
-        std::cerr << "Error: topic not found in topic_map\n";
+        // We don't actually have to do anything here
     }
 
     if (aes_key != "") {
@@ -126,5 +126,37 @@ void IrisMQTTClient::on_message(const struct mosquitto_message *message) {
 
     std::cout << message_topic << ": " << message_payload << std::endl;
 
-    insert_message(conn, message_topic, message_payload);
+    MessageRecord rec;
+    rec.topic   = message_topic;
+    rec.payload = message_payload;
+
+    if (batch_size == 1) {
+        insert_message(conn, message_topic, message_payload);
+    }
+    else {
+        message_buffer.push_back(std::move(rec));
+
+        if ((int)message_buffer.size() >= batch_size) {
+            // Bulk insert all of them in one transaction:
+            pqxx::work txn(*conn);
+            {
+                // Build an INSERT … VALUES (…) query with multiple rows.
+                std::ostringstream sql;
+                sql << "INSERT INTO messages (topic, payload) VALUES ";
+                for (size_t i = 0; i < message_buffer.size(); ++i) {
+                    auto &r = message_buffer[i];
+                    sql << "("
+                        << txn.quote(r.topic) << ", "
+                        << txn.quote(r.payload)
+                        << ")";
+                    if (i + 1 < message_buffer.size()) sql << ",";
+                }
+                txn.exec0(sql.str());
+            }
+            txn.commit();
+
+            // Clear the buffer for the next batch:
+            message_buffer.clear();
+        }
+    }
 }

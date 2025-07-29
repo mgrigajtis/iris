@@ -118,6 +118,12 @@ int main() {
     std::string postgresqluser = load_string_value_from_config("./config.json", "postgresqluser");
     std::string postgresqlpassword = load_string_value_from_config("./config.json", "postgresqlpassword");
 
+    // Load the batch size
+    int batchSize = load_int_value_from_config("./config.json", "batchsize");
+
+    // Ensure it's at least 1
+    batchSize = std::max(batchSize, 1);
+
     // The MQTT settings are required
     if (mqtthost == "" || mqttport == 0 || mqtttimeout == 0) {
         return 1;
@@ -162,7 +168,7 @@ int main() {
     // Initialize MQTT
     mosqpp::lib_init();
     std::string unique_client_id = generate_unique_mqtt_client_id();
-    IrisMQTTClient client(unique_client_id.c_str(), mqtthost.c_str(), mqttport, mqtttimeout, &topics, conn);
+    IrisMQTTClient client(unique_client_id.c_str(), mqtthost.c_str(), mqttport, mqtttimeout, &topics, batchSize, conn);
 
     // Subscribe to each topic from the config file
     for (const auto &topic : topics) {
